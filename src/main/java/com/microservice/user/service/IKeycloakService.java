@@ -14,5 +14,6 @@ public interface IKeycloakService {
     String createUsers(List<UserDTO> userDTOS);
     void deleteUser(String userId);
     void updateUser(String userId, UserDTO userDTO);
+    void forgotPassword(String userId);
 }
 

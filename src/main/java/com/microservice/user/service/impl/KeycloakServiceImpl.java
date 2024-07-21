@@ -1,5 +1,6 @@
 package com.microservice.user.service.impl;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import com.microservice.user.dto.UserDTO;
@@ -20,6 +21,9 @@ import org.springframework.stereotype.Service;
 
 import javax.ws.rs.core.Response;
 import java.util.Collections;
+
+import static com.microservice.user.util.KeycloakProvider.getRealmResource;
+import static com.microservice.user.util.KeycloakProvider.getUserResource;
 
 @Service
 @Slf4j
@@ -60,7 +64,7 @@ public class KeycloakServiceImpl implements IKeycloakService {
     public String createUser(@NonNull UserDTO userDTO) {
 
         int status = 0;
-        UsersResource usersResource = KeycloakProvider.getUserResource();
+        UsersResource usersResource = getUserResource();
 
         UserRepresentation userRepresentation = new UserRepresentation();
         userRepresentation.setFirstName(userDTO.getFirstName());
@@ -136,7 +140,7 @@ public class KeycloakServiceImpl implements IKeycloakService {
      * @return void
      */
     public void deleteUser(String userId) {
-        KeycloakProvider.getUserResource()
+        getUserResource()
                 .get(userId)
                 .remove();
     }
@@ -163,8 +167,23 @@ public class KeycloakServiceImpl implements IKeycloakService {
         user.setEmailVerified(true);
         user.setCredentials(Collections.singletonList(credentialRepresentation));
 
-        UserResource usersResource = KeycloakProvider.getUserResource().get(userId);
+        UserResource usersResource = getUserResource().get(userId);
         usersResource.update(user);
+    }
+
+    @Override
+    public void forgotPassword(String email) {
+        UsersResource usersResource = KeycloakProvider.getUserResource();
+        List<UserRepresentation> representsClientList = usersResource.searchByEmail(email,true);
+        UserRepresentation userRepresentation = representsClientList.stream().findFirst().orElse(null);
+        if(userRepresentation != null){
+            UserResource userResource = usersResource.get(userRepresentation.getId());
+            List<String> actions = new ArrayList<>();
+            actions.add("UPDATE_PASSWORD");
+            userResource.executeActionsEmail(actions);
+            return;
+        }
+        throw new RuntimeException("User not found");
     }
 
 }

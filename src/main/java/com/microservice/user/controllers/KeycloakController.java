@@ -6,7 +6,6 @@ import com.microservice.user.service.IKeycloakService;
 import com.microservice.user.util.mappers.UserDTOMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -30,6 +29,16 @@ public class KeycloakController {
     @GetMapping("/search/{username}")
     public ResponseEntity<?> searchUserByUsername(@PathVariable String username){
         return ResponseEntity.ok(keycloakService.searchUserByUsername(username));
+    }
+
+    @PutMapping("/forgot-password/{email}")
+    public ResponseEntity<?> updatePassword(@PathVariable String email){
+        try {
+            keycloakService.forgotPassword(email);
+            return ResponseEntity.ok("Revisa tu correo para actualizar tu contraseña");
+        }catch (Exception e){
+            return ResponseEntity.badRequest().body("Error updating password : "+e.getMessage());
+        }
     }
 
 
