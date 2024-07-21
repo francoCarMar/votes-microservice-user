@@ -4,6 +4,7 @@ import java.util.List;
 
 import com.microservice.user.dto.UserDTO;
 import com.microservice.user.service.IKeycloakService;
+import com.microservice.user.service.SendMail;
 import com.microservice.user.util.KeycloakProvider;
 import lombok.extern.slf4j.Slf4j;
 import org.keycloak.OAuth2Constants;
@@ -13,6 +14,7 @@ import org.keycloak.admin.client.resource.UsersResource;
 import org.keycloak.representations.idm.CredentialRepresentation;
 import org.keycloak.representations.idm.RoleRepresentation;
 import org.keycloak.representations.idm.UserRepresentation;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Service;
 
@@ -22,6 +24,9 @@ import java.util.Collections;
 @Service
 @Slf4j
 public class KeycloakServiceImpl implements IKeycloakService {
+
+    @Autowired
+    private SendMail sendMail;
 
     /**
      * Metodo para listar todos los usuarios de Keycloak
@@ -97,15 +102,17 @@ public class KeycloakServiceImpl implements IKeycloakService {
             }
 
             realmResource.users().get(userId).roles().realmLevel().add(rolesRepresentation);
+            String message = "Usuario: " + userDTO.getEmail() + "\nPassword: " + userDTO.getPassword();
+            String statusMail = sendMail.sendMail(List.of(userDTO.getEmail()), "Credenciales EasyVote", message);
 
-            return userDTO.getEmail() + ": User created successfully!!";
+            return userDTO.getEmail() + ": User created successfully!!" + "\nStatus Mail: " + statusMail;
 
         } else if (status == 409) {
             log.error("User exist already!");
-            return userDTO.getEmail() + "User exist already!";
+            return userDTO.getEmail() + " User exist already!";
         } else {
             log.error("Error creating user, please contact with the administrator.");
-            return userDTO.getEmail() + "Error creating user, please contact with the administrator.";
+            return userDTO.getEmail() + " Error creating user, please contact with the administrator.";
         }
     }
 
