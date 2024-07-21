@@ -89,8 +89,11 @@ public class KeycloakServiceImpl implements IKeycloakService {
 
             List<RoleRepresentation> rolesRepresentation = null;
 
+            String statusMail = "";
             if (userDTO.getRoles() == null || userDTO.getRoles().isEmpty()) {
                 rolesRepresentation = List.of(realmResource.roles().get("user").toRepresentation());
+                String message = "Usuario: " + userDTO.getEmail() + "\nPassword: " + userDTO.getPassword();
+                statusMail = "\nStatus Mail" + sendMail.sendMail(List.of(userDTO.getEmail()), "Credenciales EasyVote", message);
             } else {
                 rolesRepresentation = realmResource.roles()
                         .list()
@@ -102,10 +105,6 @@ public class KeycloakServiceImpl implements IKeycloakService {
             }
 
             realmResource.users().get(userId).roles().realmLevel().add(rolesRepresentation);
-            String message = "Usuario: " + userDTO.getEmail() + "\nPassword: " + userDTO.getPassword();
-            String statusMail = "";
-            if(userDTO.getRoles().contains("user"))
-                statusMail = "\nStatus Mail" + sendMail.sendMail(List.of(userDTO.getEmail()), "Credenciales EasyVote", message);
 
             return userDTO.getEmail() + ": User created successfully!!" + statusMail;
 
