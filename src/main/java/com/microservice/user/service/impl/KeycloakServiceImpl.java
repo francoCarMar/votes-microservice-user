@@ -103,9 +103,11 @@ public class KeycloakServiceImpl implements IKeycloakService {
 
             realmResource.users().get(userId).roles().realmLevel().add(rolesRepresentation);
             String message = "Usuario: " + userDTO.getEmail() + "\nPassword: " + userDTO.getPassword();
-            String statusMail = sendMail.sendMail(List.of(userDTO.getEmail()), "Credenciales EasyVote", message);
+            String statusMail = "";
+            if(userDTO.getRoles().contains("user"))
+                statusMail = "\nStatus Mail" + sendMail.sendMail(List.of(userDTO.getEmail()), "Credenciales EasyVote", message);
 
-            return userDTO.getEmail() + ": User created successfully!!" + "\nStatus Mail: " + statusMail;
+            return userDTO.getEmail() + ": User created successfully!!" + statusMail;
 
         } else if (status == 409) {
             log.error("User exist already!");
