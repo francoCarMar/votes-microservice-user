@@ -31,6 +31,11 @@ public class KeycloakController {
         return ResponseEntity.ok(keycloakService.searchUserByUsername(username));
     }
 
+    @GetMapping("/search-email/{email}")
+    public ResponseEntity<?> getUserResource(@PathVariable String email) {
+        return ResponseEntity.ok(keycloakService.searchUserByEmail(email));
+    }
+
     @PutMapping("/forgot-password/{email}")
     public ResponseEntity<?> updatePassword(@PathVariable String email){
         try {

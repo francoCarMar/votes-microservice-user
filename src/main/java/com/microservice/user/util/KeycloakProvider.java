@@ -1,11 +1,21 @@
 package com.microservice.user.util;
 
 
+import com.microservice.user.dto.UserDTO;
+import com.microservice.user.dto.UserResponseDTO;
 import org.jboss.resteasy.client.jaxrs.internal.ResteasyClientBuilderImpl;
 import org.keycloak.admin.client.Keycloak;
 import org.keycloak.admin.client.KeycloakBuilder;
 import org.keycloak.admin.client.resource.RealmResource;
+import org.keycloak.admin.client.resource.UserResource;
 import org.keycloak.admin.client.resource.UsersResource;
+import org.keycloak.representations.idm.RoleRepresentation;
+import org.keycloak.representations.idm.UserRepresentation;
+
+import java.util.List;
+import java.util.Optional;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 public class KeycloakProvider {
 
@@ -36,6 +46,17 @@ public class KeycloakProvider {
     public static UsersResource getUserResource() {
         RealmResource realmResource = getRealmResource();
         return realmResource.users();
+    }
+
+    public static UserResponseDTO getUserByEmail(String email){
+        List<UserRepresentation> users = getUserResource().searchByEmail(email, true);
+        if(users.isEmpty()){
+            return null;
+        }
+        String userId = users.get(0).getId();
+        List<RoleRepresentation> roles = getUserResource().get(userId).roles().realmLevel().listAll();
+        Set<String> rolesNames = roles.stream().map(RoleRepresentation::getName).collect(Collectors.toSet());
+        return new UserResponseDTO(users.get(0).getEmail(), users.get(0).getUsername(), users.get(0).getFirstName(), users.get(0).getLastName(), rolesNames);
     }
 }
 

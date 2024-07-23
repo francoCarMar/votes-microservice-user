@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.microservice.user.dto.UserDTO;
+import com.microservice.user.dto.UserResponseDTO;
 import com.microservice.user.service.IKeycloakService;
 import com.microservice.user.service.SendMail;
 import com.microservice.user.util.KeycloakProvider;
@@ -55,6 +56,10 @@ public class KeycloakServiceImpl implements IKeycloakService {
                 .searchByUsername(username, true);
     }
 
+    @Override
+    public UserResponseDTO searchUserByEmail(String email) {
+        return KeycloakProvider.getUserByEmail(email);
+    }
 
     /**
      * Metodo para crear un usuario en keycloak
