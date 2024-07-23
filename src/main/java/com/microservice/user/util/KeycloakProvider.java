@@ -56,7 +56,7 @@ public class KeycloakProvider {
         String userId = users.get(0).getId();
         List<RoleRepresentation> roles = getUserResource().get(userId).roles().realmLevel().listAll();
         Set<String> rolesNames = roles.stream().map(RoleRepresentation::getName).collect(Collectors.toSet());
-        return new UserResponseDTO(users.get(0).getEmail(), users.get(0).getUsername(), users.get(0).getFirstName(), users.get(0).getLastName(), rolesNames);
+        return new UserResponseDTO(userId,users.get(0).getEmail(), users.get(0).getUsername(), users.get(0).getFirstName(), users.get(0).getLastName(), rolesNames);
     }
 }
 
