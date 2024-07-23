@@ -68,8 +68,12 @@ public class KeycloakController {
 
     @PostMapping("/create-users")
     public ResponseEntity<String> createUsers(@RequestParam("file") MultipartFile file){
-        List<UserDTO> userDTOS = UserDTOMapper.CSVToUserDTO(file);
-        String response = keycloakService.createUsers(userDTOS);
-        return ResponseEntity.ok(response);
+        try{
+            List<UserDTO> userDTOS = UserDTOMapper.CSVToUserDTO(file);
+            String response = keycloakService.createUsers(userDTOS);
+            return ResponseEntity.ok(response);
+        }catch (Exception e){
+            return ResponseEntity.badRequest().body("Error creating users : "+e.getMessage());
+        }
     }
 }
